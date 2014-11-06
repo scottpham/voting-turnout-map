@@ -120,13 +120,8 @@
             pointer-events: none;
             }
 
-        .subunit.San.Benito,
-        .subunit.Lake {
-            fill: lightgray;
-        }
-
         .subunit {
-            fill: white;
+            fill: #f9f9f9;
             stroke: lightgray;
             stroke-width: 1px;
         }
@@ -159,19 +154,23 @@
 
         .circles {
             fill: lightgray;
-            fill-opacity: .75;
-            stroke: darkgray;
+            fill-opacity: .65;
+            stroke: gray;
             stroke-width: .5px;
+        }
+
+        .keyLabel {
+            font: 12px sans-serif;
         }
 
         </style>
 </head>
 <body>
-    <h1>TITLE</h1>
-    <h2>GRAF</h2>
+    <h1>Voter Turnout By County</h1>
+    <h2>In this map there's a bubble for each California County. The size of the bubble corresponds to the number of registered voters on the books in that county. The color corresponds to turnout. Big pale bubbles in Los Angeles and Alameda Counties have large voter populations and low turnout. Small, dark bubbles in the central and northern parts of the state vote at a high percentage, but low overall numbers.</h2>
 
 
-<!--     <button id="population" type="button" class="btn btn-default btn-xs">By Population</button> -->
+<!--     <button id="turnoutSize" type="button" class="btn btn-default btn-xs">Circle Size = Turnout Percentage</button> -->
 
 <!--     <button id="crime" type="button" class="btn btn-default btn-xs">By Crime</button> -->
 
@@ -181,10 +180,10 @@
     <div id="map"></div>
 
 
-    <!--<div class="footnotes">
+    <div class="footnotes">
         <h4>Notes</h4>
-        <p></p>
-    </div> -->
+        <p>The secretary of state's <a href="http://vote.sos.ca.gov/returns/status/">current returns</a>calculate as a percentage of total registered voters. Turnout as a percentage of voter-eligible population (VEP) is a much better method, but these numbers are still useful for making comparisons across counties.</p>
+    </div>
 
     <div class="footer">
         <p>Source: California Secretary of State</a></p>

@@ -11,7 +11,6 @@ var margin = {
     left: 20
 };
 
-var circleRange = [3,40];
 
 var colors = {
     'red1': '#6C2315', 'red2': '#A23520', 'red3': '#D8472B', 'red4': '#E27560', 'red5': '#ECA395', 'red6': '#F5D1CA',
@@ -43,6 +42,8 @@ function render(width) {
 
     var height = .88 * width;
 
+    var circleRange = [.011 * width, .09 * width];
+
     var  projection = d3.geo.mercator()
         .scale(width*4)
         .center([-124.19, 41.92]) //exact upper left of california according to latlong.net
@@ -60,8 +61,8 @@ function render(width) {
 
     //format for tooltip
     var format = function(d){
-        if (d) { return (d3.format("0.2%"))(d) }
-        else { return "None"}
+        if (d) { return (d3.format("0.1%"))(d) }
+        else { return "Not Available"}
         }
 
     queue()
@@ -71,33 +72,43 @@ function render(width) {
 
     //empty objects to later be mapped with data from csvs
     var rateByCounty = {};
+    var registeredByCounty = {};
 
     function ready(error, ca, votes){
         //create a js object which maps county names to values
+        //vote percentage
         votes.forEach(function(d) { 
             rateByCounty[d.county] = +d.percentage; });
 
-        console.log(rateByCounty);
+        //total registered
+        votes.forEach(function(d){
+            registeredByCounty[d.county] = +d.registered; 
+        });
+
+        //console.log(rateByCounty);
 
         mapData = topojson.feature(ca, ca.objects.subunits);
 
+        //max for legend and color
         var max = d3.max(votes, function(d) { return +d.percentage; });
 
         //function to assign colors to shapes
         var color = d3.scale.threshold() //colorscale
-            .domain([.1, .2, .3, .4, .5, .6])
-            .range(colorbrewer.Reds[7]);
+            .domain([0, .1, .2, .3, .4, .5, .6, .7])
+            .range(colorbrewer.Oranges[9]);
 
-        //format for legend
-        var truncate = function(d) { 
-                return '$' + (d/1000000) + " m";
-            };
+        // //format for legend
+        // var truncate = function(d) { 
+        //         return '$' + (d/1000000) + " m";
+        //     };
 
         //join lesso data to mapData by county name for bubbles
         var areas = mapData.features.map(
-            function(d) {return rateByCounty[d.properties.name];})
+            function(d) {return registeredByCounty[d.properties.name];})
 
-        //scale for circle
+        console.log(areas);
+
+        //scale for circle size
         var scale = d3.scale.sqrt()
             .domain(d3.extent(areas))
             .range(circleRange);
@@ -127,10 +138,8 @@ function render(width) {
                   .data(topojson.feature(ca, ca.objects.subunits).features)
                 .enter().append("circle")
                     .attr("transform", function(d) { return 'translate(' + path.centroid(d) + ')';})
-                  .attr("r", function(d) { return scale(rateByCounty[d.properties.name]); })
+                  .attr("r", function(d) { return scale(registeredByCounty[d.properties.name]); })
             .style("fill", function(d){ 
-                // var string = d.properties.name;
-                // upper = string.toUpperCase();
                 return color(rateByCounty[d.properties.name]);
               })
                 .on("mouseover", function(d){ //tooltip
@@ -181,15 +190,16 @@ function render(width) {
     var yAxis = d3.svg.axis()
         .scale(y)
         .orient("right")
-        .tickSize(10)
-        .tickValues([colorDomain[1], colorDomain[3], colorDomain[4], colorDomain[5]])
-        .tickFormat(d3.format(".2%"));
+        .tickSize(9)
+        //.tickValues([colorDomain[0], colorDomain[3], colorDomain[5], colorDomain[8]])
+        .tickFormat(d3.format("%"));
 
     //add label
     d3.select(".key")
         .call(yAxis)
         .append("text")
         .attr("y", -5)
+        .attr("class", "keyLabel")
         .text("2014 Voter Turnout");
 
     //set transition delay function
@@ -286,19 +296,7 @@ function render(width) {
 
 //end function render    
 }
-/*
- * NB: Use window.load instead of document.ready
- * to ensure all images have loaded
- */
-// $(window).load(function() {
-//     if (Modernizr.svg){
-//         pymChild = new pym.Child({
-//             renderCallback: draw_graphic()
-//         });
-//     }
-//     else { pymChild = new pym.Child();
-//     }
-// })
+
 
 
 
